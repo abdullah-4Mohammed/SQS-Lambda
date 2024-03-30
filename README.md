@@ -1,2 +1,2 @@
-# Lambda-invoked-invoker-pipeline
-deploying two lambdas , invoker which will invoke the second lambda invoked. terraform for the iac deployment and azure devobs for the pipelining
+# SQS invok Lambda
+deploying SQS and lambda , SQS which will invoke the lambda. terraform for the iac deployment and azure devobs for the pipelining.
