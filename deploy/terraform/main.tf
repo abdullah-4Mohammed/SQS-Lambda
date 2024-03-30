@@ -3,62 +3,51 @@ resource "aws_lambda_function" "SQS-lam" {
   function_name = "${local.resourceName}-SQS-lam"
   handler = "SQS-lam.lambda_handler"
   runtime = "python3.8"
-  role = aws_iam_role.lamb_sync_async_role.arn
-  filename = "${path.module}/../../src/lambda/invoked-lam.zip"
+  role = aws_iam_role.sqs-lam-role.arn 
+  filename = "${path.module}/../../src/lambda/SQS-lam.zip"
 }
 
-# resource "aws_lambda_function" "Invoker" {
-#   function_name = "${local.resourceName}-InvokerLambda"
-#   handler       = "invoker-lam.lambda_handler"
-#   runtime       = "python3.8"
-#   role          = aws_iam_role.lamb_sync_async_role.arn
-#   filename      = "${path.module}/../../src/lambda/invoker-lam.zip"
-#   environment {
-#     variables = {
-#       INVOKED_LAMBDA_ARN = aws_lambda_function.ToBeInvoked.arn
-#     }
-#   }
-# }
+//add sqs queue to invoke lambda function
+resource "aws_sqs_queue" "SQS" {
+  name = "${local.resourceName}-SQS"
+}
+
+// add event source mapping sqs-lambda-source-mapping
+resource "aws_lambda_event_source_mapping" "sqs-lambda-source-mapping" {
+  event_source_arn = aws_sqs_queue.SQS.arn
+  function_name = aws_lambda_function.SQS-lam.arn
+  batch_size = 1
+  starting_position = "LATEST"
+}
 
 
 # Create the IAM role
-resource "aws_iam_role" "lamb_sync_async_role" {
-  name = "${local.resourceName}-lamb_sync_async_role"
-
+resource "aws_iam_role" "sqs-lam-role" {
+  name = "${local.resourceName}-sqs-lam-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Action": "sts:AssumeRole",
+      "Effect": "Allow",
       "Principal": {
         "Service": "lambda.amazonaws.com"
       },
-      "Effect": "Allow",
-      "Sid": ""
+      "Action": "sts:AssumeRole"
     }
   ]
 }
 EOF
 }
 
-# Attach the necessary permissions to the role
-resource "aws_iam_role_policy" "lamb_sync_async_role" {
-  name = "${local.resourceName}-lamb_sync_async_role_policy"
-  role = aws_iam_role.lamb_sync_async_role.id
-
+# Create the policy
+resource "aws_iam_policy" "sqs-lam-policy" {
+  name = "${local.resourceName}-sqs-lam-policy"
+  description = "Allow lambda to send logs to CloudWatch"
   policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "lambda:InvokeFunction",
-        "lambda:InvokeAsync"
-      ],
-      "Resource": "arn:aws:lambda:*:*:function:*"
-    },
     {
       "Effect": "Allow",
       "Action": [
@@ -67,10 +56,24 @@ resource "aws_iam_role_policy" "lamb_sync_async_role" {
         "logs:PutLogEvents"
       ],
       "Resource": "arn:aws:logs:*:*:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sqs:SendMessage",
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes"
+      ],
+      "Resource": "*"
     }
   ]
 }
 EOF
 }
 
-
+# Attach the policy to the role
+resource "aws_iam_role_policy_attachment" "sqs-lam-policy-attachment" {
+  role = aws_iam_role.sqs-lam-role.name
+  policy_arn = aws_iam_policy.sqs-lam-policy.arn
+}
