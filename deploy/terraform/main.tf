@@ -70,8 +70,8 @@ resource "aws_iam_policy" "sqs-lam-policy" {
 EOF
 }
 
-# # Attach the policy to the role
-# resource "aws_iam_role_policy_attachment" "sqs-lam-policy-attachment" {
-#   role = aws_iam_role.sqs-lam-role.name
-#   policy_arn = aws_iam_policy.sqs-lam-policy.arn
-# }
+# Attach the policy to the role
+resource "aws_iam_role_policy_attachment" "sqs-lam-policy-attachment" {
+  role = aws_iam_role.sqs-lam-role.name
+  policy_arn = aws_iam_policy.sqs-lam-policy.arn
+}
