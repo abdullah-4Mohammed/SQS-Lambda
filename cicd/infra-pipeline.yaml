@@ -8,6 +8,7 @@ trigger:
     include:
     - cicd
     - deploy
+    - src
 
 pool: 
   vmImage: 'ubuntu-latest'
