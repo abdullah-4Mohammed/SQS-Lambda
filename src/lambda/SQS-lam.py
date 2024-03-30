@@ -7,3 +7,4 @@ export const handler = async (event) => {
     }
     return `Successfully processed ${event.Records.length} messages.`;
 };
+

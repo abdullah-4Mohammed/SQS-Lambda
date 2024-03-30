@@ -1,7 +1,7 @@
 # add resource lambda function python ToBeInvoked
 resource "aws_lambda_function" "SQS-lam" {
   function_name = "${local.resourceName}-SQS-lam"
-  handler = "SQS-lam.lambda_handler"
+  handler = "SQS-lam.handler"
   runtime = "nodejs18.x"
   role = aws_iam_role.sqs-lam-role.arn 
   filename = "${path.module}/../../src/lambda/SQS-lam.zip"
