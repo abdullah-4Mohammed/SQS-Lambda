@@ -2,6 +2,6 @@ variables:
   region: eu-west-2
   awsConnection: "AzToAWS"
   backendBucketName: "backend-tfstate"
-  backendBucket: "lambda-invoke-backend-tfstate-euw2"
+  backendBucket: "sqs-lam-backend-tfstate-euw2"
   regionShortName: euw2
   serviceName: sqs-lam
