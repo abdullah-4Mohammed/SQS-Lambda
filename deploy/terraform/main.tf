@@ -1,24 +1,24 @@
 # add resource lambda function python ToBeInvoked
-resource "aws_lambda_function" "ToBeInvoked" {
-  function_name = "${local.resourceName}-ToBeInvokedLambda"
-  handler = "invoked-lam.lambda_handler"
+resource "aws_lambda_function" "SQS-lam" {
+  function_name = "${local.resourceName}-SQS-lam"
+  handler = "SQS-lam.lambda_handler"
   runtime = "python3.8"
   role = aws_iam_role.lamb_sync_async_role.arn
   filename = "${path.module}/../../src/lambda/invoked-lam.zip"
 }
 
-resource "aws_lambda_function" "Invoker" {
-  function_name = "${local.resourceName}-InvokerLambda"
-  handler       = "invoker-lam.lambda_handler"
-  runtime       = "python3.8"
-  role          = aws_iam_role.lamb_sync_async_role.arn
-  filename      = "${path.module}/../../src/lambda/invoker-lam.zip"
-  environment {
-    variables = {
-      INVOKED_LAMBDA_ARN = aws_lambda_function.ToBeInvoked.arn
-    }
-  }
-}
+# resource "aws_lambda_function" "Invoker" {
+#   function_name = "${local.resourceName}-InvokerLambda"
+#   handler       = "invoker-lam.lambda_handler"
+#   runtime       = "python3.8"
+#   role          = aws_iam_role.lamb_sync_async_role.arn
+#   filename      = "${path.module}/../../src/lambda/invoker-lam.zip"
+#   environment {
+#     variables = {
+#       INVOKED_LAMBDA_ARN = aws_lambda_function.ToBeInvoked.arn
+#     }
+#   }
+# }
 
 
 # Create the IAM role
