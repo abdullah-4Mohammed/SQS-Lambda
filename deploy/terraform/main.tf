@@ -16,8 +16,6 @@ resource "aws_sqs_queue" "SQS" {
 resource "aws_lambda_event_source_mapping" "sqs-lambda-source-mapping" {
   event_source_arn = aws_sqs_queue.SQS.arn
   function_name = aws_lambda_function.SQS-lam.arn
-  batch_size = 1
-  starting_position = "LATEST"
 }
 
 
