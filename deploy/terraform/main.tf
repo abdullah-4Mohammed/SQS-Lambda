@@ -1,10 +1,17 @@
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_file = "${path.module}/../../src/lambda/SQS-lam.js"
+  output_path = "${path.module}/../../src/lambda/SQS-lam.zip"
+}
+
 # add resource lambda function python ToBeInvoked
 resource "aws_lambda_function" "SQS-lam" {
   function_name = "${local.resourceName}-SQS-lam"
   handler = "SQS-lam.handler"
   runtime = "nodejs18.x"
   role = aws_iam_role.sqs-lam-role.arn 
-  filename = "${path.module}/../../src/lambda/SQS-lam.zip"
+  filename = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 }
 
 //add sqs queue to invoke lambda function
