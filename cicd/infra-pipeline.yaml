@@ -3,7 +3,7 @@ name: $(SourceBranchName)-$(Date:yyyyMmdd)$(Rev:.r)
 trigger:
   branches:
     include:
-    - master
+    - main
   paths:
     include:
     - cicd
